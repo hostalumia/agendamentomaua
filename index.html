@@ -1,0 +1,936 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-id="th-modified">Agendamento de Gravações - Instituto Mauá de Tecnologia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --maua-dark: #205464;
+      --maua-accent: #0EFFEB;
+      --maua-blue: #47A6C4;
+      --maua-black: #000000;
+      --maua-white: #ffffff;
+      --maua-bg: #f0f4f6;
+      --maua-card-bg: #ffffff;
+      --maua-border: #d0dbe0;
+      --disabled-bg: #e2e8f0;
+      --disabled-text: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--maua-bg);
+      color: #1e293b;
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background-color: var(--maua-dark);
+      color: var(--maua-white);
+      padding: 24px 20px;
+      text-align: center;
+      border-bottom: 4px solid var(--maua-accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: var(--maua-accent);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--maua-card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid var(--maua-border);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--maua-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid var(--maua-accent);
+      padding-left: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input, select {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--maua-border);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+      background-color: #f8fafc;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--maua-blue);
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(71, 166, 196, 0.2);
+    }
+
+    .counter-badge {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      background: var(--maua-dark);
+      color: var(--maua-white);
+      padding: 12px 20px;
+      border-radius: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      border: 2px solid var(--maua-accent);
+      margin-bottom: 24px;
+    }
+
+    .counter-badge span {
+      font-weight: 700;
+      color: var(--maua-accent);
+    }
+
+    .month-filter {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+
+    .month-btn {
+      background: #e2e8f0;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .month-btn.active {
+      background: var(--maua-dark);
+      color: var(--maua-accent);
+    }
+
+    .days-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .day-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1px solid var(--maua-border);
+      border-radius: 8px;
+      gap: 12px;
+    }
+
+    .day-info {
+      min-width: 140px;
+    }
+
+    .day-date {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--maua-dark);
+    }
+
+    .day-weekday {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-transform: capitalize;
+    }
+
+    .periods-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .period-chip {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--maua-blue);
+      background-color: #ffffff;
+      color: var(--maua-dark);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .period-chip:hover:not(.disabled):not(.selected) {
+      background-color: rgba(71, 166, 196, 0.15);
+    }
+
+    .period-chip.selected {
+      background-color: var(--maua-dark);
+      color: var(--maua-accent);
+      border-color: var(--maua-dark);
+      box-shadow: 0 2px 6px rgba(32, 84, 100, 0.3);
+    }
+
+    .period-chip.disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-text);
+      border-color: #cbd5e1;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+
+    .actions-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--maua-dark);
+      color: var(--maua-accent);
+    }
+
+    .btn-primary:hover {
+      background-color: #173e4a;
+    }
+
+    .btn-secondary {
+      background-color: var(--maua-blue);
+      color: #ffffff;
+    }
+
+    .btn-secondary:hover {
+      background-color: #388ba6;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--maua-dark);
+      color: var(--maua-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--maua-dark);
+      color: var(--maua-white);
+    }
+
+    /* Card Summary Popup / Visual Output */
+    #summaryCard {
+      display: none;
+      background: #ffffff;
+      border: 2px solid var(--maua-dark);
+      border-top: 8px solid var(--maua-dark);
+      padding: 24px;
+      border-radius: 12px;
+      margin-top: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card-header-maua {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--maua-accent);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card-header-maua h3 {
+      color: var(--maua-dark);
+      font-size: 1.2rem;
+    }
+
+    .card-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .selected-slots-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .selected-slots-table th, .selected-slots-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+    }
+
+    .selected-slots-table th {
+      background-color: var(--maua-dark);
+      color: var(--maua-accent);
+    }
+
+  </style>
+<meta property="og:title" content="Agendamento de Gravações - Instituto Mauá de Tecnologia" data-id="th-modified"><meta name="description" content="Agendamento Mauá" data-id="th-modified"><meta property="og:description" content="Agendamento Mauá" data-id="th-modified"><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified"><meta property="og:image:width" content="1501" data-id="th-modified"><meta property="og:image:height" content="1501" data-id="th-modified"><meta property="og:image:type" content="image/png" data-id="th-modified"><meta property="og:url" content="https://agendamentomaua.tiiny.site/" data-id="th-modified"><meta property="og:type" content="website" data-id="th-modified"><script type="text/javascript" src="https://tiiny.host/ad-script.js"></script><script defer="" data-domain="agendamentomaua.tiiny.site" src="https://analytics.tiiny.net/js/plausible.js"></script></head>
+<body>
+
+  <header>
+    <h1>INSTITUTO MAUÁ DE TECNOLOGIA</h1>
+    <p>Agendamento de Gravações de Aulas &amp; Conteúdos</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- Formulário de Identificação do Professor -->
+    <div class="card">
+      <div class="section-title">1. Dados do Docente</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="profNome">Nome Completo *</label>
+          <input type="text" id="profNome" placeholder="Ex: Prof. Dr. Carlos Eduardo Silva" required="">
+        </div>
+        <div class="form-group">
+          <label for="profEmail">E-mail Institucional *</label>
+          <input type="email" id="profEmail" placeholder="usuario@maua.br" required="">
+        </div>
+        <div class="form-group">
+          <label for="profZap">WhatsApp / Telefone *</label>
+          <input type="tel" id="profZap" placeholder="(11) 99999-9999" required="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Seleção de Curso e Disciplina -->
+    <div class="card">
+      <div class="section-title">2. Curso e Disciplina</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label for="selectCurso">Curso *</label>
+          <input type="text" id="selectCurso" placeholder="Digite o nome do curso" required="">
+        </div>
+        <div class="form-group full">
+          <label for="selectDisciplina">Disciplina *</label>
+          <input type="text" id="selectDisciplina" placeholder="Digite o nome da disciplina" required="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Flutuante de Seleção -->
+    <div class="counter-badge">
+      <div>Períodos Selecionados: <span id="slotsCount">0</span> / 5</div>
+      <div style="font-size: 0.8rem; color: #cbd5e1;">Selecione de 3 a 5 horários</div>
+    </div>
+
+    <!-- Seleção de Datas e Períodos -->
+    <div class="card">
+      <div class="section-title">3. Seleção de Horários (Out/2026 - Ago/2027)</div>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;" class="  ablefocused">
+        * Domingos e feriados nacionais/estaduais foram desconsiderados. Aos sábados, não há período noturno. Clique no período desejado para selecionar.
+      </p>
+
+      <div class="month-filter" id="monthFilterContainer">
+        <!-- Gerado via JavaScript -->
+      </div>
+
+      <div class="days-list" id="daysListContainer">
+        <!-- Dias e horários gerados via JavaScript -->
+      </div>
+    </div>
+
+    <div class="card" id="cardLabSection">
+  <div class="section-title">3.1. Gravação em Laboratório (Opcional)</div>
+
+  <div class="form-group">
+    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 0.95rem; font-weight: 600;">
+      <input type="checkbox" id="checkPrecisaLab" onchange="toggleLabOptions()" style="width: 20px; height: 20px; accent-color: var(--maua-dark);">
+      A gravação de algum dos períodos selecionados precisa ser realizada em laboratório na IES?
+    </label>
+  </div>
+
+  <div id="labContainer" style="display: none;" class="lab-box">
+    <p style="font-size: 0.85rem; color: #b45309; font-weight: 600; margin-bottom: 12px;">
+      ⚠️ <strong>Regra de Exclusividade:</strong> O dia reservado para gravação em laboratório será de uso <u>exclusivo</u> para esta finalidade, não sendo permitida a utilização do estúdio na mesma data.
+    </p>
+
+    <label style="margin-bottom: 8px; display: block; font-weight: 700; color: var(--maua-dark);">
+      Indique abaixo em qual(is) das suas datas/períodos escolhidos a gravação será no Laboratório:
+    </label>
+
+    <div id="labSlotsList" style="display: flex; flex-direction: column; gap: 8px;">
+      <p style="font-size: 0.85rem; color: #94a3b8; font-style: italic;">
+        Selecione primeiro de 3 a 5 períodos no item 3 para visualizar as opções aqui.
+      </p>
+    </div>
+  </div>
+</div>
+
+    <!-- Ações e Envio -->
+    <div class="card">
+      <div class="section-title">4. Finalizar e Exportar</div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="finalizarAgendamento()">
+          💾 Salvar Agendamento
+        </button>
+        <button class="btn btn-secondary" onclick="exportarCSV()">
+          📊 Baixar Planilha (CSV)
+        </button>
+        <button class="btn btn-outline" onclick="gerarCardComprovante()">
+          📇 Gerar Card / Comprovante
+        </button>
+      </div>
+    </div>
+
+    <!-- Card Comprovante Exibido após finalização -->
+    <div id="summaryCard">
+      <div class="card-header-maua">
+        <div>
+          <h3>INSTITUTO MAUÁ DE TECNOLOGIA</h3>
+          <small style="color: #64748b;">Comprovante de Agendamento de Gravações</small>
+        </div>
+        <div style="text-align: right;">
+          <strong style="color: var(--maua-dark);" id="cardDataEmissao"></strong>
+        </div>
+      </div>
+
+      <div class="card-info-grid">
+        <div><strong>Docente:</strong> <span id="cardNome">-</span></div>
+        <div><strong>E-mail:</strong> <span id="cardEmail">-</span></div>
+        <div><strong>WhatsApp:</strong> <span id="cardZap">-</span></div>
+        <div><strong>Curso:</strong> <span id="cardCurso">-</span></div>
+        <div style="grid-column: 1 / -1;"><strong>Disciplina:</strong> <span id="cardDisciplina">-</span></div>
+      </div>
+
+      <table class="selected-slots-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Data</th>
+            <th>Dia da Semana</th>
+            <th>Período</th>
+          </tr>
+        </thead>
+        <tbody id="cardSlotsTableBody">
+        </tbody>
+      </table>
+
+      <div style="margin-top: 16px; text-align: right;">
+        <button class="btn btn-outline" style="min-width: 120px;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Dataset de Cursos e Disciplinas vindo do CSV
+    const cursosData = {"Manufatura Aditiva, Indústria 4.0 e Automação": ["Transformação Digital (Indústria Inteligente / Indústria 4.0)", "Integração de Sistemas Mecatrônicos e IoT Industrial", "Robótica Colaborativa e Automação de Sistemas de Manufatura", "Sistemas Térmicos e Eficiência Energética Industrial", "Cibersegurança de Sistemas Industriais e de Automação", "Inteligência Artificial Aplicada a Sistemas Industriais", "Modelagem e Simulação de Sistemas Industriais", "Manufatura Aditiva e Desenvolvimento de Produtos", "Realidade Aumentada e Tecnologias Imersivas Aplicadas à Indústria"], "Infraestrutura para Cidades Inteligentes: Mobilidade; Energia e Sistemas Urbanos": ["Conceito de Cidades Inteligentes: governança e políticas públicas", "Cidades Inteligentes e planejamento urbano sustentável", "I. A. aplicada à Gestão Urbana", "Eficiência energética em cidade inteligentes", "Sistemas inteligentes de transportes e mobilidade ativa", "Saneamento e gestão de resíduos sólidos urbanos", "Digital twins e simulação em urbanismo", "Banco de dados geográficos e análise temporal", "Geotecnologias para cidades inteligentes"], "Engenharia da Qualidade e Segurança de Alimentos": ["Microbiologia e Toxicologia de alimentos", "Conservação de alimentos", "Desenho sanitário e higienização na indústria de alimentos", "Legislação em Segurança de Alimentos", "Programas de pré-requisitos para a gestão da qualidade e segurança de alimentos", "Rastreabilidade, recolhimento e gestão de incidentes", "Análise de perigos e pontos críticos de controle", "Defesa dos alimentos", "Tecnologias digitais aplicadas a qualidade e segurança de alimentos", "Ferramentas da qualidade aplicadas à sistemas de gestão de qualidade e segurança dos alimentos", "Cultura de Segurança de alimentos", "Normas e certificações em sistemas de gestão e segurança de alimentos", "Formação de auditores internos em qualidade e segurança de alimentos", "Análise de risco (risk assessment, risk management, risk communication)"], "Gestão da Inovação & Metodologias Ágeis": ["Fundamentos da Inovação e Transformação Digital", "Liderança Ágil e Gestão de Equipes de Alta Performance", "Cultura Organizacional e Governança Corporativa", "Fomentos para inovação", "Design Thinking aplicado à projetos", "Métricas de  Inovação para Tomada de Decisão", "Gestão de Projetos com abordagens e Metodologias Ágeis", "Criação e Gestão de Produtos e Portfólio de Inovação", "I.A. aplicado à Gestão de Projetos", "Análise dados para Negócios, tendências e megatendências", "Ecossistema de inovação e Open Innovation", "Visual Thinking e Storytelling como apoio na comunicação"], "Engenharia de Hidrogênio Verde e Sistemas de Energia Sustentável": ["Eletroquímica e eletrólise", "Integração de energias renováveis", "Células a combustível e mobilidade", "Logística e cadeia do hidrogênio verde", "Regulação e certificação de hidrogênio verde", "Viabilidade e financiamento de projetos em hidrogênio verde", "Gestão de projetos em hidrogênio verde", "Digital Twins e IA em sistemas de hidrogênio verde", "Projeto aplicado em hidrogênio verde"], "Sistemas Térmicos e Eficiência Energética em Processos Industriais": ["Termodinâmica e processos térmicos", "Sistemas de vapor e caldeiras industriais", "Sistemas a gás", "Sistemas de troca térmica e resfriamento", "Sistemas de Cogeração", "Diagnóstico e gestão energética industrial", "KPIs e inteligência energética", "Eficiência energética em sistemas industriais", "Medição, monitoramento e dashboards energéticos", "IA, simulação e Digital Twins em sistemas térmicos", "Projeto aplicado em sistemas térmicos e eficiência energética"], "Gestão de Projetos e Portfólio: PMI; Agile; Integração": ["Gestão de Projetos: da Estratégia à Execução", "Liderança Ágil e Gestão de Equipes de Alta Performance", "Técnicas de Negociação e Gestão de Conflitos", "Inteligência Emocional e Comunicação Eficaz", "Cultura Organizacional e Governança Corporativa", "Alinhamento estratégico:Portfólio, Programas e Projeto com construção de indicadores", "Análise de dados e BI aplicados à Gestão de Projetos e Portifólio", "Estruturação e medição de OKRs", "Design Thinking aplicado à projetos", "Conduzindo Projetos por meio do 6 Sigma", "I.A. aplicado à Gestão de Projetos", "Técnicas avançadas de gestão de custos de projeto"], "Liderança e Transformação Digital: Change Management, Estratégia": ["Liderança Ágil e Gestão de Equipes de Alta Performance", "Gestão de Mudança Organizacional Digital", "Gestão de Talentos e Carreira", "Regulamentação e Governança Digital para Liderança", "Estratégias para Negócios Digitais", "Análise dados para Negócios, tendências e megatendências", "Cultura de dados e analytics para liderança", "Segurança, Compliance e Riscos Digitais", "IA na Gestão Digital: Transformação e Impacto", "Transformação Digital e Tecnologias Emergentes", "Ética, Cibersegurança e Governança de Dados", "Fundamentos de Business Intelligence e Data Analytics"], "Sistemas Embarcados com Microcontroladores: Arduino; STM32; Firmware": ["Fundamentos e Arquitetura de Sistemas Embarcados", "Programação em C para Firmware e Sistemas Embarcados", "Eletrônica, Sensores e Interfaces para Sistemas Embarcados", "Prototipagem de Sistemas Embarcados com Arduino", "Arquitetura ARM e Programação de Microcontroladores STM32", "Periféricos, Comunicação e Controle no STM32", "Arquitetura e Desenvolvimento de Firmware Embarcado", "Sistemas de Tempo Real (RTOS), Confiabilidade e Otimização de Firmware", "Inteligência Artificial e Machine Learning em Sistemas Embarcados"], "Digital Twins & Simulação Avançada (industrial, infraestrutura, produto)": ["Fundamentos, Ecossistema de Digital Twins, Internet das Coisas (IoT) e Aquisição de Dados em Tempo Real", "Inteligência Artificial e Predição", "Simulação de Eventos Discretos e Processos Industriais", "Plataformas de Integração e Cloud Computing", "Digital Twins em Cidades Inteligentes e Infraestrutura", "Ética, Cibersegurança e Governança de Dados", "Outra"], "XR/Realidade Aumentada e Virtual aplicada": ["Introdução à AR e VR", "Ferramentas e plataformas", "Design e interação", "Desenvolvimento de projetos em AR", "Desenvolvimento de projetos em VR", "Implementação e testes", "Projeto e laboratório de AR e VR"], "Segurança da Informação e Defesa Cibernética": ["Fundamentos de Segurança da Informação e Conceitos Gerais", "Ameaças, Vulnerabilidades e Mitigações", "Criptografia Aplicada e Gestão de Chaves", "Engenharia Social e Threat Intelligence", "Arquitetura de Segurança e Redes", "Operações de Segurança e Monitoramento (SOC, SIEM)", "Gestão de Identidade e Acesso (IAM) e Segurança em Nuvem", "Resposta a Incidentes e Forense Digital", "Governança, Risco e Compliance (GRC)", "Gestão de Riscos de Terceiros e Auditorias", "Contrainteligência Cibernética e Conscientização em Segurança"]};
+
+    // Feriados Nacionais e Estaduais (SP) de Out/2026 a Ago/2027 (Format YYYY-MM-DD)
+    const feriados = [
+      "2026-10-12", // Nossa Sra Aparecida
+      "2026-11-02", // Finados
+      "2026-11-15", // Proclamação da República
+      "2026-11-20", // Consciência Negra
+      "2026-12-25", // Natal
+      "2027-01-01", // Ano Novo
+      "2027-02-08", // Carnaval (Segunda)
+      "2027-02-09", // Carnaval (Terça)
+      "2027-03-26", // Sexta-feira Santa
+      "2027-04-21", // Tiradentes
+      "2027-05-01", // Dia do Trabalho
+      "2027-05-27", // Corpus Christi
+      "2027-07-09"  // Revolução Constitucionalista
+    ];
+
+    // Períodos selecionados pelo professor ativo
+    let selecionados = []; 
+
+    // Simulação de períodos já ocupados por outros professores
+    // Em produção com Google Sheets, esse objeto é sincronizado via API
+   const API_URL =  "https://script.google.com/macros/s/AKfycbz2SNU2EUknQ9yf9Lq5gsTIBBVgl7aH0yQsUQAEpqn9lgvOTe9dH9ipI7G8rgF-vSAnbg/exec"; 
+    
+    let ocupadosGerais = {};
+
+    window.onload = async function() {
+      gerarFiltroMeses();
+      
+      // Mostra mensagem carregando enquanto busca na planilha
+      document.getElementById("daysListContainer").innerHTML = "<p style='padding: 24px; text-align: center; color: var(--maua-dark);'>Carregando horários ocupados... aguarde.</p>";
+      
+      try {
+        const response = await fetch(API_URL);
+        ocupadosGerais = await response.json();
+      } catch (error) {
+        console.error("Erro ao carregar do Google Sheets:", error);
+      }
+      
+      carregarMes("2026-10");
+    };
+
+
+    function populaCursos() {
+      const select = document.getElementById("selectCurso");
+      Object.keys(cursosData).sort().forEach(curso => {
+        const opt = document.createElement("option");
+        opt.value = curso;
+        opt.textContent = curso;
+        select.appendChild(opt);
+      });
+    }
+
+    function atualizarDisciplinas() {
+      const curso = document.getElementById("selectCurso").value;
+      const selectDisc = document.getElementById("selectDisciplina");
+      selectDisc.innerHTML = '<option value="">-- Selecione a Disciplina --</option>';
+
+      if (curso && cursosData[curso]) {
+        cursosData[curso].forEach(disc => {
+          const opt = document.createElement("option");
+          opt.value = disc;
+          opt.textContent = disc;
+          selectDisc.appendChild(opt);
+        });
+      }
+    }
+
+    const mesesNomes = [
+      { id: "2026-10", nome: "Out/2026" },
+      { id: "2026-11", nome: "Nov/2026" },
+      { id: "2026-12", nome: "Dez/2026" },
+      { id: "2027-01", nome: "Jan/2027" },
+      { id: "2027-02", nome: "Fev/2027" },
+      { id: "2027-03", nome: "Mar/2027" },
+      { id: "2027-04", nome: "Abr/2027" },
+      { id: "2027-05", nome: "Mai/2027" },
+      { id: "2027-06", nome: "Jun/2027" },
+      { id: "2027-07", nome: "Jul/2027" },
+      { id: "2027-08", nome: "Ago/2027" }
+    ];
+
+    let mesAtualFiltro = "2026-10";
+
+    function gerarFiltroMeses() {
+      const container = document.getElementById("monthFilterContainer");
+      container.innerHTML = "";
+      mesesNomes.forEach(m => {
+        const btn = document.createElement("button");
+        btn.className = `month-btn ${m.id === mesAtualFiltro ? 'active' : ''}`;
+        btn.textContent = m.nome;
+        btn.onclick = () => {
+          document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          mesAtualFiltro = m.id;
+          carregarMes(m.id);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function carregarMes(anoMes) {
+      const container = document.getElementById("daysListContainer");
+      container.innerHTML = "";
+
+      const [ano, mes] = anoMes.split('-').map(Number);
+      const dataInicio = new Date(ano, mes - 1, 1);
+      const dataFim = new Date(ano, mes, 0);
+
+      const startDateLimit = new Date(2026, 9, 1); // 01 Oct 2026
+      const endDateLimit = new Date(2027, 7, 30);  // 30 Aug 2027
+
+      let cur = new Date(dataInicio);
+
+      while (cur <= dataFim) {
+        if (cur >= startDateLimit && cur <= endDateLimit) {
+          const dayOfWeek = cur.getDay();
+          const isoDate = cur.toISOString().split('T')[0];
+
+          // Regra C: Desconsiderar Domingos (0) e Feriados
+          if (dayOfWeek !== 0 && !feriados.includes(isoDate)) {
+            const row = criarLinhaDia(cur, isoDate, dayOfWeek);
+            container.appendChild(row);
+          }
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+
+    function criarLinhaDia(dateObj, isoDate, dayOfWeek) {
+      const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      
+      const div = document.createElement("div");
+      div.className = "day-row";
+
+      const formattedDate = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const isSabado = dayOfWeek === 6;
+
+      div.innerHTML = `
+        <div class="day-info">
+          <div class="day-date">${formattedDate}</div>
+          <div class="day-weekday">${diasSemana[dayOfWeek]}</div>
+        </div>
+        <div class="periods-group">
+          ${gerarChipPeriodo(isoDate, "Matutino", "Matutino (08h-12h)")}
+          ${gerarChipPeriodo(isoDate, "Vespertino", "Vespertino (13h-17h)")}
+          ${isSabado ? '' : gerarChipPeriodo(isoDate, "Noturno", "Noturno (18h-22h)")}
+        </div>
+      `;
+
+      return div;
+    }
+
+    function gerarChipPeriodo(isoDate, periodoKey, label) {
+      const slotId = `${isoDate}_${periodoKey}`;
+      const isOcupado = ocupadosGerais[slotId];
+      const isSelected = selecionados.some(s => s.id === slotId);
+
+      let classes = "period-chip";
+      if (isOcupado && !isSelected) classes += " disabled";
+      if (isSelected) classes += " selected";
+
+      const titleAttr = isOcupado ? `title="Reservado por: ${isOcupado.prof}"` : '';
+
+      return `<div class="${classes}" ${titleAttr} onclick="toggleSlot('${isoDate}', '${periodoKey}', '${label}', this)">
+        ${label}
+      </div>`;
+    }
+
+    function toggleSlot(isoDate, periodoKey, label, el) {
+      const slotId = `${isoDate}_${periodoKey}`;
+
+      // Regra F: Se estiver reservado por outra pessoa, inativo
+      if (ocupadosGerais[slotId] && !selecionados.some(s => s.id === slotId)) {
+        alert("Este período já foi reservado por outro professor.");
+        return;
+      }
+
+      const index = selecionados.findIndex(s => s.id === slotId);
+
+      if (index >= 0) {
+        // Deselecionar
+        selecionados.splice(index, 1);
+        el.classList.remove('selected');
+      } else {
+        // Regra E: Limite de 5 períodos
+        if (selecionados.length >= 5) {
+          alert("Você já selecionou o limite máximo de 5 períodos!");
+          return;
+        }
+        selecionados.push({ id: slotId, date: isoDate, periodo: periodoKey, label: label, isLab: false });
+        el.classList.add('selected');
+      }
+
+      document.getElementById("slotsCount").textContent = selecionados.length;
+      atualizarListaLab();
+    }
+
+    function validarFormulario() {
+      const nome = document.getElementById("profNome").value.trim();
+      const email = document.getElementById("profEmail").value.trim();
+      const zap = document.getElementById("profZap").value.trim();
+      const curso = document.getElementById("selectCurso").value;
+      const disciplina = document.getElementById("selectDisciplina").value;
+
+      if (!nome || !email || !zap || !curso || !disciplina) {
+        alert("Por favor, preencha todos os seus dados pessoais, curso e disciplina antes de prosseguir.");
+        return false;
+      }
+
+      if (selecionados.length < 3 || selecionados.length > 5) {
+        alert(`Você precisa selecionar entre 3 e 5 períodos. Atual: ${selecionados.length}`);
+        return false;
+      }
+
+      const precisaLab = document.getElementById("checkPrecisaLab").checked;
+      if (precisaLab && !selecionados.some(s => s.isLab)) {
+        alert("Marque em qual dos períodos selecionados a gravação será realizada em laboratório.");
+        return false;
+      }
+
+      return { nome, email, zap, curso, disciplina, precisaLab };
+    }
+
+    async function finalizarAgendamento() {
+      const dados = validarFormulario();
+      if (!dados) return;
+
+      const btn = document.querySelector(".btn-primary");
+      btn.innerHTML = "⏳ Verificando disponibilidade..."; // Novo texto de feedback
+      btn.disabled = true;
+
+      try {
+        // 1. FAZ UMA NOVA CONSULTA ANTES DE SALVAR
+        const responseCheck = await fetch(API_URL);
+        const ocupadosAtualizados = await responseCheck.json();
+
+        // 2. VERIFICA SE HÁ CONFLITOS COM OS HORÁRIOS SELECIONADOS
+        const conflitos = [];
+        selecionados.forEach(slot => {
+          if (ocupadosAtualizados[slot.id]) {
+            conflitos.push(slot);
+          }
+        });
+
+        // 3. SE HOUVER CONFLITO, CANCELA O ENVIO E ATUALIZA A TELA
+        if (conflitos.length > 0) {
+          let msg = "⚠️ Atenção! Enquanto você preenchia, outra pessoa reservou os seguintes horários:\n\n";
+          conflitos.forEach(c => {
+            msg += `- ${c.date.split('-').reverse().join('/')} (${c.label})\n`;
+          });
+          msg += "\nPor favor, escolha outros horários disponíveis.";
+          alert(msg);
+
+          // Atualiza a base de dados local com a versão mais recente
+          ocupadosGerais = ocupadosAtualizados;
+          
+          // Remove apenas os itens conflitantes da seleção atual do usuário
+          selecionados = selecionados.filter(s => !ocupadosAtualizados[s.id]);
+          document.getElementById("slotsCount").textContent = selecionados.length;
+          
+          // Recarrega a visualização do mês para mostrar os botões desabilitados
+          carregarMes(mesAtualFiltro);
+
+          btn.innerHTML = "💾 Salvar Agendamento";
+          btn.disabled = false;
+          return; // Interrompe a função aqui, não salva nada!
+        }
+
+        // 4. SE ESTIVER TUDO LIVRE, PROSSEGUE COM O SALVAMENTO
+        btn.innerHTML = "⏳ Salvando...";
+
+        const payload = {
+          nome: dados.nome,
+          email: dados.email,
+          zap: dados.zap,
+          curso: dados.curso,
+          disciplina: dados.disciplina,
+          ies: "Mauá",
+          slots: selecionados
+        };
+
+        const responseSave = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const resultadoSave = await responseSave.json();
+        if (!resultadoSave.ok) {
+          alert("Um ou mais horários atingiram o limite de 2 reservas. Atualize a seleção e tente novamente.");
+          ocupadosGerais = await (await fetch(API_URL)).json();
+          carregarMes(mesAtualFiltro);
+          return;
+        }
+        
+        // Trava os itens na tela localmente para não precisar recarregar
+        selecionados.forEach(s => { ocupadosGerais[s.id] = { prof: dados.nome }; });
+        
+        alert("Agendamento salvo com sucesso!");
+        gerarCardComprovante();
+
+      } catch (e) {
+        alert("Erro ao salvar ou verificar horários. Verifique sua conexão de internet.");
+      } finally {
+        // Só reativa o botão se não tiver gerado o comprovante com sucesso,
+        // ou você pode deixar ativo caso a pessoa queira gerar o CSV depois.
+        btn.innerHTML = "💾 Salvar Agendamento";
+        btn.disabled = false;
+      }
+    }
+
+
+
+    function exportarCSV() {
+      const dados = validarFormulario();
+      if (!dados) return;
+
+      let csv = "Docente,Email,WhatsApp,Curso,Disciplina,Data,Periodo\n";
+      selecionados.forEach(s => {
+        csv += `"${dados.nome}","${dados.email}","${dados.zap}","${dados.curso}","${dados.disciplina}","${s.date}","${s.periodo}"\n`;
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Agendamento_Maua_${dados.nome.replace(/\s+/g, '_')}.csv`;
+      link.click();
+    }
+
+    function gerarCardComprovante() {
+      const dados = validarFormulario();
+      if (!dados) return;
+
+      document.getElementById("cardNome").textContent = dados.nome;
+      document.getElementById("cardEmail").textContent = dados.email;
+      document.getElementById("cardZap").textContent = dados.zap;
+      document.getElementById("cardCurso").textContent = dados.curso;
+      document.getElementById("cardDisciplina").textContent = dados.disciplina;
+      document.getElementById("cardDataEmissao").textContent = new Date().toLocaleDateString('pt-BR');
+
+      const tbody = document.getElementById("cardSlotsTableBody");
+      tbody.innerHTML = "";
+
+      const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+
+      // Ordenar por data
+      const sorted = [...selecionados].sort((a,b) => a.date.localeCompare(b.date));
+
+      sorted.forEach((s, i) => {
+        const d = new Date(s.date + "T00:00:00");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${d.toLocaleDateString('pt-BR')}</td>
+          <td>${diasSemana[d.getDay()]}</td>
+          <td>${s.label}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const card = document.getElementById("summaryCard");
+      card.style.display = "block";
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleLabOptions() {
+    const container = document.getElementById("labContainer");
+    const isChecked = document.getElementById("checkPrecisaLab").checked;
+
+    container.style.display = isChecked ? "block" : "none";
+
+    if (isChecked) {
+      atualizarListaLab();
+    }
+  }
+
+  function atualizarListaLab() {
+    const container = document.getElementById("labSlotsList");
+    if (!document.getElementById("checkPrecisaLab").checked) return;
+
+    if (selecionados.length === 0) {
+      container.innerHTML =
+        '<p style="font-size: 0.85rem; color: #94a3b8; font-style: italic;">Selecione primeiro seus períodos no item 3 para listar as datas aqui.</p>';
+      return;
+    }
+
+    const diasSemana = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
+    ];
+
+    let html = "";
+    const sorted = [...selecionados].sort((a, b) => a.date.localeCompare(b.date));
+
+    sorted.forEach((s) => {
+      const d = new Date(s.date + "T00:00:00");
+      const formattedDate = d.toLocaleDateString("pt-BR");
+      const weekDay = diasSemana[d.getDay()];
+
+      html += `
+        <div class="lab-item">
+          <input
+            type="checkbox"
+            id="chk_lab_${s.id}"
+            ${s.isLab ? "checked" : ""}
+            onchange="setSlotLab('${s.id}', this.checked)"
+            style="width: 18px; height: 18px; accent-color: var(--maua-dark);"
+          >
+          <label for="chk_lab_${s.id}" style="cursor: pointer; flex: 1;">
+            <strong>${formattedDate} (${weekDay})</strong> - Período: ${s.label}
+          </label>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function setSlotLab(slotId, isLab) {
+    const slot = selecionados.find(s => s.id === slotId);
+    if (slot) {
+      slot.isLab = isLab;
+    }
+  }
+  </script>
+
+</body></html>
